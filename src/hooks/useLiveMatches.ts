@@ -18,7 +18,10 @@ export function useLiveMatches(competitionId?: string) {
       setLoading(false);
     };
     load();
-    const channel = supabase.channel('public-live-matches').on('postgres_changes', { event: '*', schema: 'public', table: 'matches' }, () => load()).subscribe();
+    const channel = supabase
+      .channel(`public-live-matches-${Date.now()}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'matches' }, () => load())
+      .subscribe();
     return () => { alive = false; void supabase.removeChannel(channel); };
   }, [competitionId]);
   return { matches, loading, error };
